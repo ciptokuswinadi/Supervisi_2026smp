@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi Telaah RPPM — Pembelajaran Mendalam</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface2: #F0EEE9;
+  --border: #E2DDD6;
+  --border2: #C8C2B8;
+  --text: #1A1915;
+  --text2: #6B6760;
+  --text3: #9C9890;
+  --accent: #1D4B8F;
+  --accent-light: #E8EEF8;
+  --accent2: #2E6B3E;
+  --accent2-light: #E8F2EB;
+  --warn: #8B4A0E;
+  --warn-light: #FDF0E6;
+  --danger: #8B1A1A;
+  --danger-light: #FDE8E8;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.top-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.top-bar-icon {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.top-bar-icon svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
+.top-bar-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.top-bar-sub { font-size: 12px; color: var(--text2); margin-left: auto; }
+
+.main { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+
+.step-indicator {
+  display: flex; gap: 0; margin-bottom: 28px;
+  border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;
+}
+.step {
+  flex: 1; padding: 10px 14px; text-align: center;
+  background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border-right: 1px solid var(--border);
+}
+.step:last-child { border-right: none; }
+.step.active { background: var(--accent); color: #fff; }
+.step.done { background: var(--accent2-light); color: var(--accent2); }
+.step-num { display: block; font-size: 16px; font-weight: 700; margin-bottom: 1px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+}
+.card-title svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; }
+.card-sub { font-size: 12px; color: var(--text2); margin-bottom: 18px; }
+
+.form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field label { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: 0.04em; text-transform: uppercase; }
+.form-field input, .form-field select {
+  padding: 9px 11px; font-size: 13px; font-family: inherit;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  background: var(--bg); color: var(--text);
+  transition: border-color 0.15s;
+}
+.form-field input:focus, .form-field select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29,75,143,0.08);
+}
+.form-field.span2 { grid-column: span 2; }
+.form-field.span3 { grid-column: span 3; }
+
+.upload-zone {
+  border: 2px dashed var(--border2); border-radius: var(--radius-lg);
+  padding: 36px 20px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--bg);
+}
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: var(--accent-light); }
+.upload-zone svg { width: 40px; height: 40px; stroke: var(--text3); fill: none; stroke-width: 1.5; margin-bottom: 10px; }
+.upload-zone.has-file { border-style: solid; border-color: var(--accent2); background: var(--accent2-light); }
+.upload-zone.has-file svg { stroke: var(--accent2); }
+.upload-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--text2); }
+.upload-fname { font-size: 13px; font-weight: 600; color: var(--accent2); margin-top: 8px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 20px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: 1px solid transparent; cursor: pointer; transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #163d7a; }
+.btn-primary:disabled { background: var(--border2); color: var(--text3); border-color: var(--border2); cursor: not-allowed; }
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border2); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-success { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+.btn-success:hover { background: #255532; }
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+.btn-row { display: flex; gap: 10px; margin-top: 20px; align-items: center; flex-wrap: wrap; }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-box {
+  background: var(--accent-light); border: 1px solid rgba(29,75,143,0.2);
+  border-radius: var(--radius-lg); padding: 28px; text-align: center; margin: 8px 0;
+}
+.loading-box .spinner2 {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 14px;
+}
+.loading-box p { font-size: 13px; color: var(--accent); font-weight: 500; }
+.loading-step { font-size: 12px; color: var(--text2); margin-top: 6px; }
+
+.result-section { margin-bottom: 12px; }
+
+.summary-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px;
+}
+.sumcard {
+  background: var(--surface2); border-radius: var(--radius); padding: 14px 16px;
+}
+.sumcard-val { font-size: 22px; font-weight: 700; }
+.sumcard-lab { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.telaah-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.telaah-table th {
+  background: var(--accent); color: #fff; padding: 8px 10px;
+  text-align: left; font-size: 11px; font-weight: 600;
+}
+.telaah-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.telaah-table .group-row td { background: var(--surface2); font-weight: 700; font-size: 12px; color: var(--accent); padding: 6px 10px; }
+.telaah-table .total-row td { background: var(--accent); color: #fff; font-weight: 700; padding: 9px 10px; }
+
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+.b4 { background: #E2EFDA; color: #375623; }
+.b3 { background: #DEEAF1; color: #1F4E79; }
+.b2 { background: #FFF2CC; color: #7F6000; }
+.b1 { background: #FFDAD9; color: #C00000; }
+
+.rec-box {
+  border-radius: var(--radius); padding: 10px 14px;
+  font-size: 12.5px; margin-bottom: 8px; line-height: 1.55;
+}
+.rec-box.warn { background: var(--warn-light); border-left: 3px solid var(--warn); color: var(--warn); border-radius: 0 var(--radius) var(--radius) 0; }
+.rec-box.ok { background: var(--accent2-light); border-left: 3px solid var(--accent2); color: var(--accent2); border-radius: 0 var(--radius) var(--radius) 0; }
+
+.progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 10px 0; }
+.progress-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.pill-green { background: var(--accent2-light); color: var(--accent2); }
+.pill-blue { background: var(--accent-light); color: var(--accent); }
+.pill-amber { background: var(--warn-light); color: var(--warn); }
+.pill-red { background: var(--danger-light); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-icon">
+    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+  </div>
+  <div>
+    <div class="top-bar-title">Aplikasi Telaah RPPM</div>
+  </div>
+  <div class="top-bar-sub">Supervisi Perencanaan Pembelajaran Mendalam</div>
+  <a href="https://wa.me/6282285273744" target="_blank" style="margin-left:12px;display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:20px;text-decoration:none;white-space:nowrap">
+    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2C6.476 2 2 6.477 2 11.99c0 1.872.518 3.625 1.42 5.127L2 22l5.042-1.396A9.956 9.956 0 0011.99 22C17.523 22 22 17.523 22 11.99 22 6.476 17.523 2 11.99 2zm0 18.18a8.168 8.168 0 01-4.168-1.144l-.298-.178-3.096.858.878-3.008-.195-.309A8.168 8.168 0 013.82 11.99c0-4.513 3.67-8.18 8.17-8.18 4.512 0 8.18 3.667 8.18 8.18 0 4.512-3.668 8.19-8.18 8.19z"/></svg>
+    Hubungi Pengembang
+  </a>
+</div>
+
+<div id="login-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:52px;height:52px;background:var(--accent);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
+        <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:700;color:var(--text)">Aplikasi Telaah RPPM</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px">Masukkan password untuk melanjutkan</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase">Nomor HP (WhatsApp)</label>
+      <input id="login-hp" type="tel" placeholder="Contoh: 081234567890"
+        style="padding:10px 12px;font-size:13px;font-family:inherit;border:1px solid var(--border2);border-radius:10px;background:var(--bg);color:var(--text);outline:none"
+        onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase">Password</label>
+      <input id="login-pass" type="password" placeholder="Masukkan password pengguna"
+        style="padding:10px 12px;font-size:13px;font-family:inherit;border:1px solid var(--border2);border-radius:10px;background:var(--bg);color:var(--text);outline:none"
+        onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div id="login-err" style="display:none;color:var(--danger);font-size:12px;margin-bottom:12px;padding:8px 12px;background:var(--danger-light);border-radius:8px">Password salah. Silakan coba lagi.</div>
+    <button onclick="doLogin()" style="width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Masuk</button>
+    <div style="margin-top:20px;text-align:center;font-size:11.5px;color:var(--text2)">
+      Butuh akses? Hubungi pengembang:<br>
+      <a href="https://wa.me/6282285273744" target="_blank" style="color:var(--accent2);font-weight:600;text-decoration:none">&#128241; Cipto Kuswinadi — 082285273744</a>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="app-main" style="display:none">
+
+  <div class="step-indicator">
+    <div class="step active" id="step1-ind" onclick="goStep(1)"><span class="step-num">1</span>Identitas</div>
+    <div class="step" id="step2-ind" onclick="goStep(2)"><span class="step-num">2</span>Upload RPPM</div>
+    <div class="step" id="step3-ind" onclick="goStep(3)"><span class="step-num">3</span>Hasil Telaah</div>
+  </div>
+
+  <!-- STEP 1: IDENTITAS -->
+  <div class="page active" id="page1">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
+        Data Guru
+      </div>
+      <div class="card-sub">Isi identitas guru yang RPPM-nya akan ditelaah</div>
+      <div class="form-grid">
+        <div class="form-field span2"><label>Nama Lengkap Guru</label><input id="nama-guru" placeholder="Contoh: Cipto Kuswinadi, S.Pd., M.M" /></div>
+        <div class="form-field"><label>NIP Guru</label><input id="nip-guru" placeholder="Contoh: 196906062005011013" /></div>
+        <div class="form-field span2"><label>Mata Pelajaran</label><input id="mapel" placeholder="Contoh: IPS (Ilmu Pengetahuan Sosial)" /></div>
+        <div class="form-field"><label>Kelas / Semester</label><input id="kelas" placeholder="Contoh: IX / Genap" /></div>
+        <div class="form-field span3"><label>Nama Sekolah</label><input id="sekolah" placeholder="Contoh: SMP Negeri 1 Mojokerto" /></div>
+        <div class="form-field span2"><label>Topik / Judul RPPM</label><input id="topik" placeholder="Contoh: Jejak Maritim Nusantara..." /></div>
+        <div class="form-field"><label>Tahun Pelajaran</label><input id="tapel" placeholder="Contoh: 2025/2026" /></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Data Supervisor & Kepala Sekolah
+      </div>
+      <div class="card-sub">Isi identitas supervisor dan kepala sekolah</div>
+      <div class="form-grid">
+        <div class="form-field span2"><label>Nama Supervisor / Pengawas</label><input id="nama-sv" placeholder="Nama lengkap supervisor" /></div>
+        <div class="form-field"><label>NIP Supervisor</label><input id="nip-sv" placeholder="NIP supervisor" /></div>
+        <div class="form-field"><label>Jabatan Supervisor</label><input id="jabatan-sv" placeholder="Contoh: Pengawas Sekolah" /></div>
+        <div class="form-field"><label>Tanggal Supervisi</label><input id="tgl-sv" type="date" /></div>
+        <div class="form-field"><label>Tempat / Kota</label><input id="kota" placeholder="Contoh: Mojokerto" /></div>
+        <div class="form-field span2"><label>Nama Kepala Sekolah</label><input id="nama-kepsek" placeholder="Nama lengkap kepala sekolah" /></div>
+        <div class="form-field"><label>NIP Kepala Sekolah</label><input id="nip-kepsek" placeholder="NIP kepala sekolah" /></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Lanjut ke Upload RPPM
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: UPLOAD -->
+  <div class="page" id="page2">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        Upload Dokumen RPPM
+      </div>
+      <div class="card-sub">Upload file RPPM dalam format .doc, .docx, atau .txt untuk ditelaah secara otomatis oleh AI</div>
+
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="handleDrop(event)">
+        <svg viewBox="0 0 24 24" id="upload-icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        <div class="upload-title" id="upload-title">Klik atau seret file RPPM ke sini</div>
+        <div class="upload-sub">Format: .doc, .docx, .txt — Maks. 5MB</div>
+        <div class="upload-fname" id="upload-fname"></div>
+      </div>
+      <input type="file" id="file-input" accept=".doc,.docx,.txt" style="display:none" onchange="handleFile(this.files[0])">
+
+      <div id="text-preview-box" style="display:none;margin-top:12px;padding:12px;background:#fffbe6;border:1px solid #f0c040;border-radius:8px;font-size:11.5px;color:#555;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;line-height:1.6"></div>
+
+      <div style="margin-top:10px;display:none" id="preview-btn-wrap">
+        <button class="btn btn-secondary" style="font-size:11px;padding:6px 12px" onclick="togglePreview()">👁 Lihat / Sembunyikan Teks yang Terbaca</button>
+      </div>
+
+      <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:var(--radius);font-size:12px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text)">Catatan:</strong> Aplikasi akan membaca isi dokumen RPPM Anda, lalu AI akan menelaah 30 aspek supervisi secara otomatis berdasarkan instrumen Perencanaan Pembelajaran Mendalam (PPA 2025 & Permendikdasmen 1/2026).
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Kembali
+      </button>
+      <button class="btn btn-primary" id="btn-telaah" onclick="runTelaah()" disabled>
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        Mulai Telaah AI
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: HASIL -->
+  <div class="page" id="page3">
+    <div id="loading-box" class="loading-box" style="display:none">
+      <div class="spinner2"></div>
+      <p>AI sedang menelaah dokumen RPPM...</p>
+      <div class="loading-step" id="loading-step">Membaca dan menganalisis isi dokumen...</div>
+    </div>
+
+    <div id="result-box" style="display:none">
+      <div class="summary-grid">
+        <div class="sumcard"><div class="sumcard-val" id="r-total" style="color:var(--accent)">—</div><div class="sumcard-lab">Total skor</div></div>
+        <div class="sumcard"><div class="sumcard-val" id="r-pct" style="color:var(--text)">—</div><div class="sumcard-lab">Persentase</div></div>
+        <div class="sumcard"><div class="sumcard-val" id="r-pred" style="font-size:14px;padding-top:4px">—</div><div class="sumcard-lab">Predikat</div></div>
+        <div class="sumcard"><div class="sumcard-val" id="r-filled" style="color:var(--text2)">—</div><div class="sumcard-lab">Aspek dinilai</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="r-prog" style="width:0%"></div></div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Tabel Penilaian 30 Aspek</div>
+        <div style="overflow-x:auto;margin-top:12px">
+          <table class="telaah-table" id="result-table">
+            <thead><tr><th style="width:4%">No.</th><th style="width:36%">Aspek yang Dinilai</th><th style="width:12%">Skor</th><th>Komentar / Catatan</th></tr></thead>
+            <tbody id="result-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Rekomendasi Tindak Lanjut</div>
+        <div id="result-recs" style="margin-top:12px"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-success" id="btn-download-word" onclick="exportWord(this)">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Unduh Hasil Telaah (.doc)
+        </button>
+        <button class="btn btn-secondary" onclick="printHasil()">
+          <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+          Cetak / Simpan PDF
+        </button>
+        <button class="btn btn-secondary" onclick="goStep(1)">
+          <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          Telaah RPPM Lain
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+const VALID_PASSWORDS = [
+  "aD5tR6#&4g","c0!!XwV4s8","2$Z@2f7Pqu","v!&7WKjq86","0Xi0*s0Bo&",
+  "5k9y!J#8rT","906p&sQJx$","44@R9vCwy$","h4o2B*dC0*","k80Q*@Eyj0",
+  "0Ll2T@!v8t","*J4p1Y4l!n","KHf10&n$0q","&h2Yj9@1uG","7Z@5hn@h9F",
+  "6$KeH@3gt3","pKw$57eA1$","e1H6y@#bP7","4$mv2x9MO*","!1!0sXhl7P",
+  "k3V#9$K9nh","9Ei@3zU@6v",eN1k@suhT1",
+  "CiptoAdmin@2026"
+];
+
+const ADMIN_PASSWORD = "CiptoAdmin@2026";
+
+function normalizeHP(hp) {
+  // Normalisasi: hapus spasi/strip, ubah awalan 0 jadi 62 atau biarkan
+  return hp.replace(/[\s\-\.]/g, '').trim();
+}
+
+function doLogin() {
+  const pass = document.getElementById('login-pass').value;
+  const hp   = normalizeHP(document.getElementById('login-hp').value);
+  const errEl = document.getElementById('login-err');
+
+  // Validasi input
+  if (!hp) {
+    errEl.textContent = 'Nomor HP wajib diisi.';
+    errEl.style.display = 'block';
+    document.getElementById('login-hp').focus();
+    return;
+  }
+  if (!pass) {
+    errEl.textContent = 'Password wajib diisi.';
+    errEl.style.display = 'block';
+    document.getElementById('login-pass').focus();
+    return;
+  }
+
+  // Cek apakah password valid
+  if (!VALID_PASSWORDS.includes(pass)) {
+    errEl.textContent = 'Password salah. Silakan coba lagi.';
+    errEl.style.display = 'block';
+    document.getElementById('login-pass').focus();
+    return;
+  }
+
+  // Password admin boleh dipakai siapa saja tanpa pembatasan HP
+  if (pass === ADMIN_PASSWORD) {
+    loginSuccess();
+    return;
+  }
+
+  // Cek apakah password ini sudah terdaftar ke HP lain
+  const key = 'pw_binding_' + btoa(pass);
+  const storedHP = localStorage.getItem(key);
+
+  if (storedHP === null) {
+    // Belum pernah dipakai — daftarkan HP ini ke password
+    localStorage.setItem(key, hp);
+    loginSuccess();
+  } else if (storedHP === hp) {
+    // HP cocok — izinkan masuk
+    loginSuccess();
+  } else {
+    // Password sudah dipakai oleh HP lain
+    errEl.textContent = 'Password ini sudah digunakan oleh nomor HP lain. Hubungi pengembang untuk mendapatkan password baru.';
+    errEl.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function loginSuccess() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-main').style.display = 'block';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+let uploadedText = '';
+let telaahResult = null;
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('page'+i).classList.toggle('active', i===n);
+    const ind = document.getElementById('step'+i+'-ind');
+    ind.classList.remove('active','done');
+    if (i===n) ind.classList.add('active');
+    else if (i<n) ind.classList.add('done');
+  });
+  if (n===3) {
+    const lb = document.getElementById('loading-box');
+    lb.style.display = 'block';
+    lb.innerHTML = '<div class="spinner2"></div><p>AI sedang menelaah dokumen RPPM...</p><div class="loading-step" id="loading-step">Membaca dan menganalisis isi dokumen...</div>';
+    document.getElementById('result-box').style.display = 'none';
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+}
+
+function togglePreview() {
+  const box = document.getElementById('text-preview-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function handleFile(file) {
+  if (!file) return;
+  const zone = document.getElementById('drop-zone');
+  const fname = file.name.toLowerCase();
+
+  function finalize(text) {
+    // Bersihkan whitespace berlebih tapi JAGA struktur baris
+    text = text.replace(/[ \t]{2,}/g, ' ').replace(/\n{4,}/g, '\n\n\n').trim();
+    uploadedText = text.slice(0, 32000); // diperbesar jadi 32000 karakter
+    zone.classList.add('has-file');
+    document.getElementById('upload-title').textContent = '✅ File berhasil dimuat — ' + uploadedText.length + ' karakter terbaca';
+    document.getElementById('upload-fname').textContent = file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+    document.getElementById('btn-telaah').disabled = false;
+    // Tampilkan preview
+    const previewBox = document.getElementById('text-preview-box');
+    previewBox.textContent = uploadedText.slice(0, 800) + (uploadedText.length > 800 ? '\n\n... [terpotong untuk preview, ' + uploadedText.length + ' total karakter] ...' : '');
+    document.getElementById('preview-btn-wrap').style.display = 'block';
+  }
+
+  if (fname.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = e => finalize(e.target.result);
+    reader.readAsText(file, 'UTF-8');
+    return;
+  }
+
+  if (fname.endsWith('.docx')) {
+    // Gunakan mammoth.js untuk ekstrak teks DOCX dengan benar
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        // Muat mammoth dari CDN jika belum ada
+        if (typeof mammoth === 'undefined') {
+          await new Promise((res, rej) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+            s.onload = res; s.onerror = rej;
+            document.head.appendChild(s);
+          });
+        }
+        const arrayBuffer = e.target.result;
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        if (result.value && result.value.trim().length > 50) {
+          finalize(result.value);
+        } else {
+          // Fallback: coba HTML extraction
+          const htmlResult = await mammoth.convertToHtml({ arrayBuffer });
+          const tmp = document.createElement('div');
+          tmp.innerHTML = htmlResult.value;
+          finalize(tmp.innerText || tmp.textContent || '');
+        }
+      } catch(err) {
+        // Fallback manual UTF-8 decode
+        fallbackDecode(e.target.result);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    return;
+  }
+
+  if (fname.endsWith('.doc')) {
+    // .doc lama — coba UTF-16 LE decode (format Word HTML)
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      fallbackDecode(e.target.result);
+    };
+    reader.readAsArrayBuffer(file);
+    return;
+  }
+
+  // Format lain
+  const reader = new FileReader();
+  reader.onload = e => finalize(e.target.result);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function fallbackDecode(arrayBuffer) {
+  let text = '';
+  // Coba UTF-16 LE (Word HTML format)
+  try {
+    const dec16 = new TextDecoder('utf-16-le', { fatal: false });
+    const decoded = dec16.decode(new Uint8Array(arrayBuffer));
+    const stripped = decoded
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ').trim();
+    if (stripped.length > 200) { text = stripped; }
+  } catch(ex) {}
+
+  // Coba UTF-8
+  if (!text) {
+    try {
+      const dec8 = new TextDecoder('utf-8', { fatal: false });
+      const raw = dec8.decode(new Uint8Array(arrayBuffer));
+      // Ambil semua teks yang bisa dibaca (inkl. karakter Indonesia)
+      const cleaned = raw
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/[^\x20-\x7E\u00A0-\u024F\u0100-\u017E\n\r\t]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+      if (cleaned.length > text.length) text = cleaned;
+    } catch(ex) {}
+  }
+
+  const zone = document.getElementById('drop-zone');
+  if (text.length < 100) {
+    zone.innerHTML = '<p style="color:var(--danger);font-size:13px">⚠️ File tidak dapat dibaca dengan baik. Silakan simpan ulang sebagai <strong>.txt</strong> atau <strong>.docx</strong> dan upload kembali.</p>';
+    return;
+  }
+  uploadedText = text.slice(0, 32000);
+  zone.classList.add('has-file');
+  document.getElementById('upload-title').textContent = '✅ File dimuat (fallback, ' + uploadedText.length + ' karakter)';
+  document.getElementById('upload-fname').textContent = 'Preview: ' + uploadedText.slice(0, 100) + '…';
+  document.getElementById('btn-telaah').disabled = false;
+  const previewBox = document.getElementById('text-preview-box');
+  previewBox.textContent = uploadedText.slice(0, 800) + '\n\n... [' + uploadedText.length + ' total karakter] ...';
+  document.getElementById('preview-btn-wrap').style.display = 'block';
+}
+
+const ASPECTS = [
+  { group:"A. Identitas RPP", items:[
+    {no:1, label:"Nama Guru"},
+    {no:2, label:"Mata Pelajaran"},
+    {no:3, label:"Kelas / Semester"},
+    {no:4, label:"Alokasi Waktu"},
+  ]},
+  { group:"B. Identifikasi", items:[
+    {no:5, label:"Identifikasi kesiapan / pengetahuan awal murid"},
+    {no:6, label:"Analisis jenis pengetahuan materi (faktual, konseptual, prosedural, metakognitif)"},
+    {no:7, label:"Relevansi materi dengan kehidupan nyata murid"},
+    {no:8, label:"Dimensi Profil Lulusan selaras dengan TP dan kegiatan"},
+  ]},
+  { group:"C. Desain Pembelajaran", items:[
+    {no:9, label:"Capaian Pembelajaran sesuai BSKAP 046/H/KR/2025"},
+    {no:10, label:"Keterkaitan lintas disiplin ilmu (opsional)"},
+    {no:11, label:"Tujuan Pembelajaran memuat kompetensi + konten + KKO relevan"},
+    {no:12, label:"IKTP mengarah pada langkah pembelajaran"},
+    {no:13, label:"IKTP mengarah pada asesmen pembelajaran"},
+    {no:14, label:"IKTP mengarah pada pencapaian Dimensi Profil Lulusan"},
+  ]},
+  { group:"D. Kerangka Pembelajaran", items:[
+    {no:15, label:"Praktik pedagogis tergambar pada langkah pembelajaran"},
+    {no:16, label:"Kemitraan pembelajaran tergambar pada langkah/asesmen (opsional)"},
+    {no:17, label:"Lingkungan belajar tergambar pada langkah pembelajaran"},
+    {no:18, label:"Pemanfaatan digital tergambar pada langkah/asesmen (opsional)"},
+  ]},
+  { group:"E. Kegiatan Awal", items:[
+    {no:19, label:"Orientasi bermakna, apersepsi kontekstual, motivasi"},
+    {no:20, label:"Prinsip berkesadaran dan bermakna pada kegiatan awal"},
+  ]},
+  { group:"E. Kegiatan Inti", items:[
+    {no:21, label:"Pengalaman belajar MEMAHAMI"},
+    {no:22, label:"Pengalaman belajar MENGAPLIKASI"},
+    {no:23, label:"Pengalaman belajar MEREFLEKSI"},
+  ]},
+  { group:"E. Kegiatan Penutup", items:[
+    {no:24, label:"Tindakan saling MEMULIAKAN (guru-murid, murid-murid)"},
+    {no:25, label:"Umpan balik konstruktif, simpulan, rencana selanjutnya"},
+  ]},
+  { group:"F. Asesmen", items:[
+    {no:26, label:"Instrumen asesmen diagnostik (awal pembelajaran)"},
+    {no:27, label:"Instrumen asesmen formatif (selama proses)"},
+    {no:28, label:"Instrumen asesmen sumatif (hasil pembelajaran)"},
+    {no:29, label:"Kriteria Ketercapaian Tujuan Pembelajaran (KKTP)"},
+  ]},
+  { group:"G. Lembar Kerja Murid", items:[
+    {no:30, label:"LKM selaras dengan TP dan kegiatan pembelajaran"},
+  ]},
+];
+
+async function runTelaah() {
+  goStep(3);
+  const steps = [
+    "Membaca dan menganalisis isi dokumen RPPM...",
+    "Memeriksa kelengkapan identitas dan identifikasi...",
+    "Mengevaluasi desain pembelajaran dan IKTP...",
+    "Menilai langkah-langkah pembelajaran...",
+    "Menelaah asesmen dan lembar kerja murid...",
+    "Menyusun rekomendasi tindak lanjut...",
+  ];
+  let si = 0;
+  const stepEl = document.getElementById('loading-step');
+  const interval = setInterval(() => {
+    si = (si+1) % steps.length;
+    stepEl.textContent = steps[si];
+  }, 2200);
+
+  const identitas = `
+Nama Guru: ${v('nama-guru')}
+NIP Guru: ${v('nip-guru')}
+Mata Pelajaran: ${v('mapel')}
+Kelas/Semester: ${v('kelas')}
+Sekolah: ${v('sekolah')}
+Topik: ${v('topik')}
+  `.trim();
+
+  const prompt = `Anda adalah SUPERVISOR PENDIDIKAN AHLI yang sangat teliti dalam menelaah RPPM (Rancangan Pelaksanaan Pembelajaran Mendalam) berdasarkan instrumen supervisi resmi PPA 2025 dan Permendikdasmen No. 1 Tahun 2026.
+
+IDENTITAS GURU (diisi oleh pengguna aplikasi):
+${identitas}
+
+============================================================
+ISI LENGKAP DOKUMEN RPPM YANG DIUNGGAH:
+============================================================
+${uploadedText}
+============================================================
+
+PERINTAH KRITIS — BACA DENGAN SANGAT TELITI:
+
+1. BACA SELURUH TEKS RPPM DI ATAS KATA PER KATA sebelum menilai.
+2. JANGAN berasumsi "tidak ada" jika teks tidak persis menggunakan kata baku. Cari PADANAN MAKNANYA. Contoh:
+   - "2 Pertemuan (2 x 40 menit)" = Alokasi Waktu → SKOR TINGGI
+   - "kesiapan belajar", "apersepsi", "pra-pembelajaran" = identifikasi kesiapan awal murid
+   - "faktual", "konseptual", "prosedural", "metakognitif" boleh dalam bentuk tabel atau uraian
+   - "Profil Lulusan", "Profil Pelajar Pancasila", "dimensi", "karakter" = Profil Lulusan
+   - "KKTP", "kriteria ketercapaian", "indikator pencapaian", "rubrik" = KKTP
+   - "LKM", "LKPD", "lembar kerja", "lembar aktivitas" = Lembar Kerja Murid
+3. Jika IDENTITAS GURU (nama, mapel, kelas, dll.) sudah diisi di form aplikasi, MAKA aspek 1-3 otomatis ADA → beri skor minimal 3.
+4. Aspek "opsional" (no. 10, 16, 18) — jika tidak ada, beri skor 2, bukan 1.
+5. Komentar harus SPESIFIK: sebutkan kutipan atau bagian dari dokumen yang mendukung penilaian Anda.
+6. Gunakan seluruh panjang teks yang diberikan — jangan berhenti di paragraf pertama.
+
+SKALA PENILAIAN:
+- 4 = Ada dan Sangat Memenuhi (lengkap, rinci, sesuai standar PPA 2025)
+- 3 = Ada dan Cukup Memenuhi (ada namun kurang rinci atau kurang lengkap)
+- 2 = Ada namun Belum Memenuhi (ada namun sangat minimal/tidak tepat)
+- 1 = Tidak Ada (benar-benar tidak ditemukan sama sekali dalam dokumen)
+
+ASPEK PENILAIAN (30 aspek):
+A. IDENTITAS RPP
+1. Nama Guru — tercantum dalam dokumen atau form identitas
+2. Mata Pelajaran — tercantum dalam dokumen atau form identitas
+3. Kelas / Semester — tercantum dalam dokumen atau form identitas
+4. Alokasi Waktu — cari "pertemuan", "menit", "JP", "jam pelajaran", "x 40", "x 45"
+
+B. IDENTIFIKASI
+5. Identifikasi kesiapan / pengetahuan awal murid — cari "kesiapan", "pengetahuan awal", "prasyarat", "apersepsi", "diagnostik awal", "asesmen awal"
+6. Analisis jenis pengetahuan materi — cari "faktual", "konseptual", "prosedural", "metakognitif", tabel jenis pengetahuan
+7. Relevansi materi dengan kehidupan nyata murid — cari "kehidupan nyata", "kontekstual", "dunia nyata", "keseharian", "konteks lokal"
+8. Dimensi Profil Lulusan selaras dengan TP dan kegiatan — cari "Profil Lulusan", "Profil Pelajar Pancasila", "beriman", "berkebinekaan", "bernalar kritis", "kreatif", "mandiri", "bergotong royong"
+
+C. DESAIN PEMBELAJARAN
+9. Capaian Pembelajaran sesuai BSKAP 046/H/KR/2025 — cari "Capaian Pembelajaran", "CP", "BSKAP"
+10. Keterkaitan lintas disiplin ilmu (opsional) — cari "lintas mata pelajaran", "interdisiplin", "kolaborasi mapel"
+11. Tujuan Pembelajaran memuat kompetensi + konten + KKO — cari "Tujuan Pembelajaran", "TP", kata kerja operasional
+12. IKTP mengarah pada langkah pembelajaran — cari "IKTP", "Indikator Ketercapaian", keterkaitan indikator dengan kegiatan
+13. IKTP mengarah pada asesmen — keterkaitan IKTP dengan asesmen yang dirancang
+14. IKTP mengarah pada Dimensi Profil Lulusan — keterkaitan IKTP dengan karakter/profil
+
+D. KERANGKA PEMBELAJARAN
+15. Praktik pedagogis tergambar pada langkah — cari strategi mengajar: "diskusi", "inquiry", "problem based", "project", "ceramah interaktif", dll.
+16. Kemitraan pembelajaran (opsional) — cari "orang tua", "komunitas", "narasumber", "kemitraan"
+17. Lingkungan belajar tergambar — cari "setting kelas", "berkelompok", "sudut belajar", "luar kelas", "media", "alat"
+18. Pemanfaatan digital (opsional) — cari "digital", "teknologi", "aplikasi", "internet", "video", "slide", "komputer"
+
+E. KEGIATAN PEMBELAJARAN
+19. Kegiatan Awal: orientasi bermakna, apersepsi kontekstual, motivasi — cari bagian "Kegiatan Awal/Pendahuluan"
+20. Prinsip berkesadaran dan bermakna pada kegiatan awal — kedalaman apersepsi, koneksi dengan pengalaman murid
+
+21. Kegiatan Inti: pengalaman belajar MEMAHAMI — cari aktivitas membangun pemahaman konsep
+22. Kegiatan Inti: pengalaman belajar MENGAPLIKASI — cari aktivitas penerapan/praktik
+23. Kegiatan Inti: pengalaman belajar MEREFLEKSI — cari aktivitas refleksi, evaluasi diri
+
+24. Kegiatan Penutup: tindakan saling MEMULIAKAN — cari apresiasi, penghargaan, salam penutup bermakna
+25. Kegiatan Penutup: umpan balik, simpulan, rencana selanjutnya — cari simpulan, tindak lanjut, PR
+
+F. ASESMEN
+26. Asesmen diagnostik — cari "diagnostik", "asesmen awal", "pre-test", "pertanyaan pembuka"
+27. Asesmen formatif — cari "formatif", "observasi", "ceklis", "jurnal", "penilaian proses"
+28. Asesmen sumatif — cari "sumatif", "ulangan", "ujian", "post-test", "penilaian akhir"
+29. KKTP — cari "KKTP", "Kriteria Ketercapaian", "rubrik penilaian", "indikator keberhasilan"
+
+G. LEMBAR KERJA MURID
+30. LKM selaras dengan TP dan kegiatan — cari "LKM", "LKPD", "lembar kerja", "lembar aktivitas", "worksheet"
+
+Balas HANYA dalam format JSON berikut (tanpa teks pembuka, tanpa markdown, tanpa backtick):
+{
+  "scores": [
+    {"no": 1, "skor": 4, "komentar": "Nama guru tercantum jelas di identitas dokumen dan form."},
+    {"no": 2, "skor": 4, "komentar": "..."},
+    ...semua 30 aspek harus ada...
+  ],
+  "rekomendasi": [
+    {"tipe": "warn", "teks": "Aspek yang perlu diperkuat: ..."},
+    {"tipe": "ok", "teks": "Kekuatan RPPM: ..."}
+  ]
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 6000,
+        system: 'Anda adalah supervisor pendidikan ahli Indonesia yang sangat teliti. Tugas Anda adalah menelaah dokumen RPPM secara MENYELURUH dan JUJUR. Selalu baca SELURUH dokumen sebelum menilai. Jangan pernah memberi skor 1 (Tidak Ada) jika konsepnya ADA dalam dokumen meskipun menggunakan kata yang berbeda. Selalu respons dalam format JSON yang valid tanpa teks tambahan.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    clearInterval(interval);
+    const data = await res.json();
+    if (!res.ok) {
+      const errMsg = data.error?.message || JSON.stringify(data);
+      let pesanErr = 'API error ' + res.status + ': ' + errMsg;
+      if (res.status === 401) pesanErr = 'Autentikasi gagal (401): API key tidak valid atau tidak diizinkan di browser.';
+      else if (res.status === 429) pesanErr = 'Terlalu banyak permintaan (429): Tunggu beberapa saat lalu coba lagi.';
+      else if (res.status >= 500) pesanErr = 'Server AI sedang sibuk (' + res.status + '): Coba lagi dalam beberapa menit.';
+      throw new Error(pesanErr);
+    }
+    const raw = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    // Bersihkan markdown backtick jika ada
+    const cleaned = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Format respons AI tidak valid. Coba ulangi telaah.');
+    telaahResult = JSON.parse(jsonMatch[0]);
+    if (!telaahResult.scores || telaahResult.scores.length === 0) throw new Error('Data skor kosong dari AI. Coba ulangi telaah.');
+    renderResult(telaahResult);
+  } catch(e) {
+    clearInterval(interval);
+    document.getElementById('loading-box').innerHTML =
+      '<div style="text-align:left;padding:4px">' +
+      '<p style="color:var(--danger);font-weight:600;margin-bottom:8px">&#9888; Terjadi Kesalahan</p>' +
+      '<p style="color:var(--text);font-size:12.5px;margin-bottom:12px">' + e.message + '</p>' +
+      '<p style="color:var(--text2);font-size:11.5px">Pastikan koneksi internet aktif, file RPPM sudah terupload, lalu coba lagi.</p>' +
+      '</div>' +
+      '<div style="margin-top:16px;display:flex;gap:10px">' +
+      '<button class="btn btn-primary" onclick="runTelaah()">&#8635; Coba Lagi</button>' +
+      '<button class="btn btn-secondary" onclick="goStep(2)">&#8592; Kembali ke Upload</button>' +
+      '</div>';
+  }
+}
+
+function v(id) { return document.getElementById(id).value.trim() || '…………………………'; }
+
+function scoreLabel(s) {
+  if (s===4) return '4 – Sangat Memenuhi';
+  if (s===3) return '3 – Cukup Memenuhi';
+  if (s===2) return '2 – Ada, Belum Memenuhi';
+  return '1 – Tidak Ada';
+}
+function scoreBadge(s) {
+  const cls = ['','b1','b2','b3','b4'][s] || 'b1';
+  return `<span class="badge ${cls}">${scoreLabel(s)}</span>`;
+}
+function predColor(pct) {
+  if (pct>=86) return {t:'Sangat Memenuhi',c:'var(--accent2)'};
+  if (pct>=71) return {t:'Cukup Memenuhi',c:'var(--accent)'};
+  if (pct>=56) return {t:'Belum Memenuhi',c:'var(--warn)'};
+  return {t:'Tidak Memenuhi',c:'var(--danger)'};
+}
+
+function renderResult(data) {
+  document.getElementById('loading-box').style.display = 'none';
+  document.getElementById('result-box').style.display = 'block';
+
+  const total = data.scores.reduce((a,s)=>a+s.skor,0);
+  const pct = Math.round((total/120)*100);
+  const pred = predColor(pct);
+
+  document.getElementById('r-total').textContent = total + ' / 120';
+  document.getElementById('r-pct').textContent = pct + '%';
+  document.getElementById('r-pred').textContent = pred.t;
+  document.getElementById('r-pred').style.color = pred.c;
+  document.getElementById('r-filled').textContent = data.scores.length + ' aspek';
+  document.getElementById('r-prog').style.width = pct + '%';
+
+  const tbody = document.getElementById('result-tbody');
+  tbody.innerHTML = '';
+  const scoreMap = {};
+  data.scores.forEach(s => scoreMap[s.no] = s);
+
+  ASPECTS.forEach(sec => {
+    const groupTr = document.createElement('tr');
+    groupTr.className = 'group-row';
+    groupTr.innerHTML = `<td colspan="4">${sec.group}</td>`;
+    tbody.appendChild(groupTr);
+    let secTotal = 0;
+    sec.items.forEach(item => {
+      const s = scoreMap[item.no] || {skor:1,komentar:'—'};
+      secTotal += s.skor;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="text-align:center">${item.no}</td><td>${item.label}</td><td>${scoreBadge(s.skor)}</td><td style="color:var(--text2)">${s.komentar}</td>`;
+      tbody.appendChild(tr);
+    });
+    const stTr = document.createElement('tr');
+    stTr.innerHTML = `<td colspan="2" style="background:var(--surface2);font-weight:600;color:var(--accent)">Subtotal ${sec.group}</td><td colspan="2" style="background:var(--surface2);font-weight:600;color:var(--accent)">${secTotal} / ${sec.items.length*4}</td>`;
+    tbody.appendChild(stTr);
+  });
+
+  const totTr = document.createElement('tr');
+  totTr.className = 'total-row';
+  totTr.innerHTML = `<td colspan="2">Total Keseluruhan</td><td colspan="2">${total} / 120 = ${pct}% — ${pred.t}</td>`;
+  tbody.appendChild(totTr);
+
+  const recBox = document.getElementById('result-recs');
+  recBox.innerHTML = '';
+  (data.rekomendasi || []).forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'rec-box ' + (r.tipe==='warn' ? 'warn' : 'ok');
+    d.textContent = (r.tipe==='warn'?'(!) ':'(+) ') + r.teks;
+    recBox.appendChild(d);
+  });
+}
+
+function fmtDate(d) {
+  if (!d) return '……………………';
+  const p = d.split('-'); return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+/* ─── HTML dokumen cetak A4 ─────────────────────────────────────── */
+function buildDocHTML() {
+  const data = telaahResult;
+  const total = data.scores.reduce((a,s)=>a+s.skor,0);
+  const pct   = Math.round((total/120)*100);
+  const pred  = predColor(pct);
+  const scoreMap = {};
+  data.scores.forEach(s => scoreMap[s.no] = s);
+
+  function sBg(s){
+    if(s===4) return 'background:#E2EFDA;color:#1A3E0E';
+    if(s===3) return 'background:#DEEAF1;color:#1F4E79';
+    if(s===2) return 'background:#FFF2CC;color:#7F6000';
+    return 'background:#FFDAD9;color:#C00000';
+  }
+
+  let rows = '';
+  ASPECTS.forEach(sec => {
+    let secTotal = 0;
+    sec.items.forEach(it => { secTotal += (scoreMap[it.no]||{skor:1}).skor; });
+    rows += `<tr><td colspan="4" style="background:#1F3864;color:#fff;font-weight:700;padding:6px 10px;font-size:10pt;letter-spacing:0.03em">${sec.group}</td></tr>`;
+    sec.items.forEach(it => {
+      const s = scoreMap[it.no] || {skor:1, komentar:'\u2014'};
+      rows += `<tr>
+        <td style="text-align:center;padding:5px 6px;border:0.75px solid #C5C5C5;width:4%;font-size:9.5pt;vertical-align:middle">${it.no}</td>
+        <td style="padding:5px 8px;border:0.75px solid #C5C5C5;width:35%;font-size:9.5pt;vertical-align:top;line-height:1.45">${it.label}</td>
+        <td style="${sBg(s.skor)};padding:5px 8px;border:0.75px solid #C5C5C5;width:18%;font-weight:700;text-align:center;font-size:9pt;vertical-align:middle">${scoreLabel(s.skor)}</td>
+        <td style="padding:5px 8px;border:0.75px solid #C5C5C5;font-size:9.5pt;vertical-align:top;line-height:1.45;color:#222">${s.komentar}</td></tr>`;
+    });
+    rows += `<tr>
+      <td colspan="2" style="background:#D9E2F3;color:#1F3864;font-weight:700;padding:5px 10px;font-size:9.5pt;border:0.75px solid #C5C5C5">Subtotal ${sec.group}</td>
+      <td colspan="2" style="background:#D9E2F3;color:#1F3864;font-weight:700;padding:5px 10px;font-size:9.5pt;border:0.75px solid #C5C5C5">${secTotal} / ${sec.items.length*4}</td></tr>`;
+  });
+
+  const recs = (data.rekomendasi||[]).map(r => {
+    const isWarn = r.tipe==='warn';
+    return `<tr>
+      <td style="width:28px;padding:6px 8px;border:0.75px solid #C5C5C5;text-align:center;font-size:11pt;vertical-align:top">${isWarn ? '&#9888;' : '&#10003;'}</td>
+      <td style="padding:6px 10px;border:0.75px solid #C5C5C5;font-size:9.5pt;color:${isWarn?'#7B2C00':'#1A4D2E'};line-height:1.5">${r.teks}</td></tr>`;
+  }).join('');
+
+  const tgl = fmtDate(document.getElementById('tgl-sv').value);
+
+  return `<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="UTF-8">
+<title>Hasil Telaah RPPM</title>
+<style>
+@page { size: A4 portrait; margin: 2.5cm 2.5cm 2cm 3cm; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Times New Roman',Times,serif;font-size:11pt;color:#111;line-height:1.55;margin:2.5cm 2.5cm 2cm 3cm}
+.kop{text-align:center;border-bottom:3px double #1F3864;padding-bottom:10px;margin-bottom:14px}
+.kop-judul{font-size:13pt;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.35;color:#1F3864}
+.kop-sub{font-size:10pt;margin-top:4px;color:#333}
+.kop-dasar{font-size:9.5pt;color:#555;margin-top:3px}
+.sec-title{font-size:10.5pt;font-weight:700;color:#1F3864;margin:12pt 0 5pt;padding-bottom:3px;border-bottom:1px solid #B0C4DE;text-transform:uppercase;letter-spacing:0.04em}
+table{width:100%;border-collapse:collapse;margin-bottom:12pt}
+.tbl-id td{padding:4px 8px;border:0.75px solid #B0B0B0;font-size:10pt;vertical-align:top}
+.tbl-id td.lbl{background:#EEF2F8;font-weight:600;width:20%;color:#1F3864}
+.tbl-nilai thead th{background:#1F3864;color:#fff;padding:7px 10px;font-size:10pt;font-weight:700;text-align:left;border:0.75px solid #1F3864}
+.ringkasan{background:#F0F4FB;border:1px solid #B0C4DE;border-radius:4px;padding:10px 14px;margin-bottom:12pt;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.ring-item{text-align:center}
+.ring-val{font-size:18pt;font-weight:700;color:#1F3864;line-height:1}
+.ring-lbl{font-size:8.5pt;color:#555;margin-top:2px}
+.ring-div{width:1px;background:#B0C4DE;height:40px}
+.legenda{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12pt;font-size:9pt}
+.leg-item{padding:3px 10px;border-radius:3px;font-weight:700}
+.ttd-wrap{display:table;width:100%;border-collapse:separate;border-spacing:0}.ttd-box{display:table-cell;width:50%;text-align:center;vertical-align:top;font-size:10.5pt;line-height:1.6;padding:0 12pt}
+.ttd-nama{font-weight:700;text-decoration:underline;font-size:10.5pt}
+.ttd-space{height:52pt}
+@media print{body{margin:0}}
+</style>
+</head><body>
+<div class="kop">
+  <div class="kop-judul">Instrumen Supervisi Perencanaan Pembelajaran Mendalam</div>
+  <div class="kop-sub">Hasil Telaah Rancangan Pelaksanaan Pembelajaran Mendalam (RPPM)</div>
+  <div class="kop-dasar">Berdasarkan PPA 2025 &amp; Permendikdasmen No. 1 Tahun 2026</div>
+</div>
+
+<div class="sec-title">A. Identitas Supervisi</div>
+<table class="tbl-id">
+  <tr><td class="lbl">Nama Guru</td><td style="width:30%">${v('nama-guru')}</td><td class="lbl" style="width:20%">NIP Guru</td><td>${v('nip-guru')}</td></tr>
+  <tr><td class="lbl">Mata Pelajaran</td><td>${v('mapel')}</td><td class="lbl">Kelas / Semester</td><td>${v('kelas')}</td></tr>
+  <tr><td class="lbl">Sekolah</td><td>${v('sekolah')}</td><td class="lbl">Tahun Pelajaran</td><td>${v('tapel')}</td></tr>
+  <tr><td class="lbl">Topik / Judul RPPM</td><td colspan="3">${v('topik')}</td></tr>
+  <tr><td class="lbl">Nama Supervisor</td><td>${v('nama-sv')}</td><td class="lbl">NIP Supervisor</td><td>${v('nip-sv')}</td></tr>
+  <tr><td class="lbl">Jabatan</td><td>${v('jabatan-sv')}</td><td class="lbl">Tanggal Supervisi</td><td>${tgl}</td></tr>
+</table>
+
+<div class="sec-title">B. Ringkasan Hasil Penilaian</div>
+<div class="ringkasan">
+  <div class="ring-item"><div class="ring-val">${total}</div><div class="ring-lbl">Total Skor</div></div>
+  <div class="ring-div"></div>
+  <div class="ring-item"><div class="ring-val">120</div><div class="ring-lbl">Skor Maksimal</div></div>
+  <div class="ring-div"></div>
+  <div class="ring-item"><div class="ring-val">${pct}%</div><div class="ring-lbl">Persentase</div></div>
+  <div class="ring-div"></div>
+  <div class="ring-item"><div class="ring-val" style="font-size:13pt;color:${pred.c}">${pred.t}</div><div class="ring-lbl">Predikat</div></div>
+  <div class="ring-div"></div>
+  <div style="text-align:left;flex:1;font-size:9pt;color:#444;line-height:1.8">
+    <b style="color:#1A3E0E">&#8805; 86%</b> = Sangat Memenuhi &nbsp;|&nbsp; <b style="color:#1F4E79">71&#8211;85%</b> = Cukup Memenuhi<br>
+    <b style="color:#7F6000">56&#8211;70%</b> = Belum Memenuhi &nbsp;|&nbsp; <b style="color:#C00000">&lt; 56%</b> = Tidak Memenuhi
+  </div>
+</div>
+
+<div class="sec-title">C. Tabel Penilaian 30 Aspek</div>
+<table class="tbl-nilai">
+  <thead><tr>
+    <th style="width:4%;text-align:center">No.</th>
+    <th style="width:35%">Aspek yang Dinilai</th>
+    <th style="width:18%;text-align:center">Skor</th>
+    <th>Komentar / Catatan Supervisor</th>
+  </tr></thead>
+  <tbody>${rows}
+  <tr>
+    <td colspan="2" style="background:#1F3864;color:#fff;font-weight:700;padding:7px 10px;font-size:10.5pt;border:0.75px solid #1F3864">TOTAL KESELURUHAN</td>
+    <td colspan="2" style="background:#1F3864;color:#fff;font-weight:700;padding:7px 10px;font-size:10.5pt;border:0.75px solid #1F3864">${total} / 120 = ${pct}% &#8212; ${pred.t}</td>
+  </tr></tbody>
+</table>
+
+<div class="sec-title">D. Keterangan Skala Penilaian</div>
+<div class="legenda">
+  <span class="leg-item" style="background:#E2EFDA;color:#1A3E0E">4 = Ada dan Sangat Memenuhi</span>
+  <span class="leg-item" style="background:#DEEAF1;color:#1F4E79">3 = Ada dan Cukup Memenuhi</span>
+  <span class="leg-item" style="background:#FFF2CC;color:#7F6000">2 = Ada dan Belum Memenuhi</span>
+  <span class="leg-item" style="background:#FFDAD9;color:#C00000">1 = Tidak Ada</span>
+</div>
+
+<div class="sec-title">E. Rekomendasi Tindak Lanjut</div>
+<table>
+  <thead><tr>
+    <th style="width:32px;text-align:center"></th>
+    <th style="font-size:10pt">Catatan &amp; Rekomendasi</th>
+  </tr></thead>
+  <tbody>${recs}</tbody>
+</table>
+
+<div class="sec-title">F. Pengesahan</div>
+<div class="ttd-wrap" style="margin-top:16pt">
+  <div class="ttd-box" style="padding-left:0">
+    <div>Mengetahui,</div>
+    <div>Kepala Sekolah</div>
+    <div class="ttd-space"></div>
+    <div class="ttd-nama">${v('nama-kepsek')}</div>
+    <div style="font-size:9.5pt">NIP. ${v('nip-kepsek')}</div>
+  </div>
+  <div class="ttd-box" style="padding-right:0">
+    <div>${v('kota')}, ${tgl}</div>
+    <div>${v('jabatan-sv')}</div>
+    <div class="ttd-space"></div>
+    <div class="ttd-nama">${v('nama-sv')}</div>
+    <div style="font-size:9.5pt">NIP. ${v('nip-sv')}</div>
+  </div>
+</div>
+</body></html>`;
+}
+
+/* ─── Unduh sebagai .doc ─────────────────────────────────────────── */
+function exportWord(btn) {
+  if (!telaahResult) { alert('Belum ada hasil telaah.'); return; }
+  if (btn) { btn.textContent = '⏳ Menyiapkan file...'; btn.disabled = true; }
+  try {
+    const html = buildDocHTML();
+    const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const nama = v('nama-guru').replace(/[\s,\.]+/g,'_') || 'Guru';
+    a.href = url; a.download = 'Telaah_RPPM_' + nama + '.doc';
+    a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => {
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+      if (btn) { btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Unduh Hasil Telaah (.doc)'; btn.disabled = false; }
+    }, 1500);
+  } catch(e) {
+    alert('Gagal mengunduh: ' + e.message);
+    if (btn) { btn.textContent = 'Unduh Hasil Telaah (.doc)'; btn.disabled = false; }
+  }
+}
+
+/* ─── Cetak / Simpan PDF ─────────────────────────────────────────── */
+function printHasil() {
+  if (!telaahResult) { alert('Belum ada hasil telaah.'); return; }
+  const html = buildDocHTML();
+  const printWin = window.open('', '_blank', 'width=960,height=800');
+  if (!printWin) { alert('Popup diblokir browser. Izinkan popup lalu coba lagi.'); return; }
+  printWin.document.open();
+  printWin.document.write(html);
+  printWin.document.close();
+  printWin.focus();
+  printWin.onload = function() { setTimeout(() => printWin.print(), 400); };
+  setTimeout(() => { try { printWin.print(); } catch(e){} }, 1200);
+}
+
+document.getElementById('tgl-sv').valueAsDate = new Date();
+</script>
+</body>
+</html>
